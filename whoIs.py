@@ -9,6 +9,7 @@ from bacpypes3.constructeddata import Any
 from bacpypes3.apdu import WhoIsRequest, IAmRequest
 from bacpypes3.primitivedata import Unsigned
 import threading
+from bacpypes3.primitivedata import ObjectIdentifier
 
 LOCAL_NIC = "192.168.1.101/24"
 
@@ -42,25 +43,37 @@ async def main():
 
 
     # Handle incoming I-Am responses
-    def indication(apdu):
+    async def indication(apdu):
         if isinstance(apdu, IAmRequest):
-            print(f"I-AM from device {apdu.iAmDeviceIdentifier} at {apdu.pduSource}")
-
+                device_id = apdu.iAmDeviceIdentifier
+                device_addr = apdu.pduSource
+                # vendor_id = getattr(apdu, "vendorIdentifier","unknown")
+                
+                print(f"Device Found!")
+                print(f"==================")
+                print(f"ID: {device_id} - Address: {device_addr}")
+                print(f"==================\n")
+        else:
+                print(f"Error reading device information: {e}")
+    
+        
 
     app.indication = indication
 
 
     # Send Who-Is broadcast
-    def send_whois():
+    async def send_whois():
         print("Sending Who-Is request (broadcast)...")
         whois = WhoIsRequest()
         whois.pduDestination = Address("255.255.255.255")  
-        app.request(whois)
-
+        await app.request(whois)
+  
+    await asyncio.sleep(1)
     # Run sequence
-    await asyncio.sleep(3)  # brief pause to ensure app is ready
-    send_whois()
-    # stop_after_delay(5)
+    await send_whois()
+    # Wait for responses
+    await asyncio.sleep(2)  # Wait 3 seconds for responses
+  
 
 print("Running BACpypes... waiting for I-Am responses...")
 asyncio.run(main())

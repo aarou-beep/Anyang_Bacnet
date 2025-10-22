@@ -11,9 +11,13 @@ logging.basicConfig(level=logging.INFO)
 # configure here
 LOCAL_NIC = "192.168.1.101/24"
 DEVICE_IP = "192.168.1.43"
-OBJ = ("analogInput", 1)
-PROP = "presentValue"
+# OBJ = ("analogInput", 1)
+# PROP = "presentValue" 
 TIMEOUT = 5
+
+OBJ=input("Enter Object Type and Instance (e.g., analogInput,1): ")
+PROP =input("Enter Property Name (e.g., presentValue): ")
+OBJ = tuple(OBJ.split(",")) 
 
 async def main():
     # local device object
@@ -45,14 +49,16 @@ async def main():
     req = ReadPropertyRequest(objectIdentifier=OBJ, propertyIdentifier=PROP)
     req.pduDestination = Address(DEVICE_IP)
 
-    try:
-        result = await asyncio.wait_for(app.request(req), timeout=TIMEOUT)
-    except asyncio.TimeoutError:
-        print("Timeout waiting for response")
-        return
-    except Exception as e:
-        print("Request failed:", e)
-        return
+
+    result = await app.response_request(req, timeout=TIMEOUT)
+        
+    #     # Extract and handle the property value
+    # if isinstance(result, ReadPropertyACK):
+    #     value = getattr(result, "propertyValue", None)
+    #     if value is None:
+    #             print("Error: No property value received")
+    #             return 
+
 
     # helper to extract value from Any/constructed result safely
     def extract_value(ack):
@@ -74,7 +80,7 @@ async def main():
 
     # handle either direct ACK or IOCB with ioResponse
     if isinstance(result, ReadPropertyACK):
-        print("Read value:", extract_value(result))
+        print("Read value:",extract_value(result)) )
     elif hasattr(result, "ioResponse") and isinstance(result.ioResponse, ReadPropertyACK):
         print("Read value:", extract_value(result.ioResponse))
     else:

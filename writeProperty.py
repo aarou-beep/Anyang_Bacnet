@@ -10,11 +10,17 @@ from bacpypes3.constructeddata import Any
 
 DEVICE_IP = "192.168.1.43"
 LOCAL_NIC = "192.168.1.101"
-OBJ = ("analogOutput", 1) 
-PROP = "presentValue" 
-VALUE = 75.5
+# OBJ = ("analogOutput", 1) 
+# PROP = "presentValue" 
+# VALUE = 75.5
 
+OBJ = input("Enter Object Type and Instance (e.g., analogOutput,1): ")
+PROP = input("Enter Property Name (e.g., presentValue): ")
+OBJ = tuple(OBJ.split(","))     
+VALUE= float(input("Enter property Value (e.g., 75.5): "))
 
+print(" ")
+print(f"Writing to {OBJ} property {PROP} value {VALUE} on device {DEVICE_IP}")
 
 async def main(): 
 # Define local BACnet device
