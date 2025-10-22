@@ -12,9 +12,13 @@ logging.basicConfig(level=logging.INFO)
 # configure here
 LOCAL_NIC = "192.168.1.101/24"
 DEVICE_IP = "192.168.1.43"
-OBJ = ("analogInput", 1)
-PROP = "presentValue"
+# OBJ = ("analogInput", 2)
+# PROP = "presentValue"
 TIMEOUT = 5
+
+OBJ = input("Enter Object Type and Instance (e.g., analogOutput,1): ")
+PROP = input("Enter Property Name (e.g., presentValue): ")
+OBJ = tuple(OBJ.split(","))     
 
 async def main():
     # local device object
